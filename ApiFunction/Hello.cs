@@ -8,9 +8,9 @@ using Microsoft.Azure.WebJobs.Host;
 
 namespace ApiFunction
 {
-    public static class Api
+    public static class Hello
     {
-        [FunctionName("Api")]
+        [FunctionName("Hello")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
