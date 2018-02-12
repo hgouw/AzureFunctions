@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ASX.Api
 {
-    public class EndOfDay
+    public class Company
     {
         public string Code { get; set; }
 

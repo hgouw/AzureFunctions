@@ -8,9 +8,9 @@ using Microsoft.Azure.WebJobs.Host;
 
 namespace ASX.Api
 {
-    public static class EndOfDaysApi
+    public static class DividendsApi
     {
-        [FunctionName("EndOfDaysApi")]
+        [FunctionName("DividendsApi")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
             HttpRequestMessage req, 
@@ -20,9 +20,9 @@ namespace ASX.Api
 
             Company endOfDay = await req.Content.ReadAsAsync<Company>();
 
-            log.Info($"EndOfDays request received for {endOfDay.Code}");
+            log.Info($"Dividends request received for {endOfDay.Code}");
 
-            return req.CreateResponse(HttpStatusCode.OK, $"Returned EndOfDays for {endOfDay.Code}");
+            return req.CreateResponse(HttpStatusCode.OK, $"Returned Dividends for {endOfDay.Code}");
         }
     }
 }
