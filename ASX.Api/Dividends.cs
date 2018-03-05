@@ -8,9 +8,9 @@ using Microsoft.Azure.WebJobs.Host;
 
 namespace ASX.Api
 {
-    public static class DividendsApi
+    public static class Dividends
     {
-        [FunctionName("DividendsApi")]
+        [FunctionName("Dividends")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
             HttpRequestMessage req, 

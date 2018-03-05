@@ -10,9 +10,18 @@ namespace ASX.Api
 {
     public static class EndOfDaysApi
     {
-        [FunctionName("EndOfDaysApi")]
+        [FunctionName("EndOfDays")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
+            // HttpTrigger parameters
+            // 1. How the Http function is going to be authorised
+            // AuthorizationLevel.Anonymous = No key required
+            // AuthorizationLevel.Function = Individual function key
+            // AuthorizationLevel.Admin = Function app key
+            // 2. Supported Http methods for the function
+            // "get"
+            // "post", "put", "patch"
+            // 3. (Optional) Function route template
             HttpRequestMessage req, 
             TraceWriter log)
         {
