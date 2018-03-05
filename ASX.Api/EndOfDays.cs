@@ -8,7 +8,7 @@ using Microsoft.Azure.WebJobs.Host;
 
 namespace ASX.Api
 {
-    public static class EndOfDaysApi
+    public static class EndOfDays
     {
         [FunctionName("EndOfDays")]
         public static async Task<HttpResponseMessage> Run(
