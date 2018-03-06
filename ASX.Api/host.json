@@ -1,6 +1,6 @@
 {
   "frameworks": {
-    "net46": {
+    "net461": {
       "dependencies": {
         "Newtonsoft.Json": "10.0.3",
         "EntityFramework": "6.1.3",
