@@ -12,7 +12,7 @@ namespace ASX.Api
     {
         [FunctionName("Dividends")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)]
             HttpRequestMessage req, 
             TraceWriter log)
         {

@@ -12,7 +12,7 @@ namespace ASX.Api
     {
         [FunctionName("EndOfDays")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)]
             // HttpTrigger parameters
             // 1. How the Http function is going to be authorised
             // AuthorizationLevel.Anonymous = No key required
