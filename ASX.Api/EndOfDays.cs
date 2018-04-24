@@ -20,7 +20,9 @@ namespace ASX.Api
             // AuthorizationLevel.Admin = Function app key
             // 2. Supported Http methods for the function
             // "get"
-            // "post", "put", "patch"
+            // "post"
+            // "put"
+            // "patch"
             // 3. (Optional) Function route template
             HttpRequestMessage req, 
             TraceWriter log)
