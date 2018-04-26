@@ -29,11 +29,11 @@ namespace ASX.Api
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-            Company endOfDay = await req.Content.ReadAsAsync<Company>();
+            var param = await req.Content.ReadAsAsync<Param>();
 
-            log.Info($"EndOfDays request received for {endOfDay.Code}");
+            log.Info($"EndOfDays request received for {param.Company}");
 
-            return req.CreateResponse(HttpStatusCode.OK, $"Returned EndOfDays for {endOfDay.Code}");
+            return req.CreateResponse(HttpStatusCode.OK, $"Returned EndOfDays for {param.Company}");
         }
     }
 }

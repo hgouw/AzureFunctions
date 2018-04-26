@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ASX.Api
 {
-    public class Company
+    public class Param
     {
-        public string Code { get; set; }
+        public string Company { get; set; }
 
         public DateTime From { get; set; }
 
