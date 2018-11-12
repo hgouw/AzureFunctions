@@ -75,7 +75,7 @@ namespace ASX.Api
 
         private static async Task RemoveFilesAsync()
         {
-            var storageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=hgouw;AccountKey=lXr8WD/7ULcm9AIrEW9s0q2jdQaVYcTB9rSaaQZJ51m3VxZya+t9yfEpavg5OFuni/A6kYx9bLCdimNRq7roHg==");
+            var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
             var client = storageAccount.CreateCloudBlobClient();
             var container = client.GetContainerReference("optus");
             var blobs = container.ListBlobs();
