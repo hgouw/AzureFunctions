@@ -11,6 +11,12 @@ using System.Xml.Linq;
 
 namespace ASX.Api
 {
+    // TO DO
+    // 1. Download the zip file
+    // 2. Unzip the zip file into txt 
+    // 3. Load the txt files into database
+    // 4. Remove the zip file and txt files
+
     public static class LoadHistoricalData
     {
         [FunctionName("LoadHistoricalData")]
@@ -18,11 +24,23 @@ namespace ASX.Api
         // "0 */1 * * * *" - every minute
         public static void Run([TimerTrigger("*/5 * * * * *")]TimerInfo myTimer, TraceWriter log)
         {
-            //var url = "/assets/data/week20180615.zip";
-            var url = "https://www.asxhistoricaldata.com/data/week20181102.zip";
-            var ok = CheckUrl(url);
+            var filename = "week20181102.zip";
+            var url = "https://www.asxhistoricaldata.com/data";
+            var ok = CheckUrl(url + "\\" + filename);
 
-            //RemoveFilesAsync().Wait();
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    var destination = Path.GetTempPath() + filename;
+                    log.Info($"Downloading the file to {destination}");
+                    //client.DownloadFile(url, destination);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Info($"Download Fail {ex.Message}");
+            }
 
             if (myTimer.IsPastDue)
             {
@@ -40,15 +58,8 @@ namespace ASX.Api
             try
             {
                 var response = request.GetResponse();
-                //using (WebResponse response = request.GetResponse())
-                //{
-                //    using (Stream stream = response.GetResponseStream())
-                //    {
-                //        var doc = XDocument.Load(stream);
-                //    }
-                //}
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -56,6 +67,18 @@ namespace ASX.Api
             return true;
         }
 
+        /*
+        private static string GenerateId()
+        {
+            long i = 1;
+            foreach (byte b in Guid.NewGuid().ToByteArray())
+            {
+                i *= ((int)b + 1);
+            }
+            return string.Format("{0:x}", i - DateTime.Now.Ticks);
+        }
+
+        //RemoveFilesAsync().Wait();
         private static async Task CopyFilesAsync()
         {
             var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
@@ -88,5 +111,63 @@ namespace ASX.Api
                 }
             }
         }
+        */
+        /*
+        public static void Run([BlobTrigger("samples-workitems/{name}", Connection = "AzureWebJobsStorage")]string myBlob, string name, [Blob("test2/{name}.csv", FileAccess.Write, Connection = "AzureWebJobsStorage")]out string outputBlob, TraceWriter log)
+        {
+            var outputstring = jsonToCSV(myBlob, ","); // add your logic to covert json to CSV
+
+            log.Info($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
+            outputBlob = outputstring;
+        }
+
+        public static void Run([BlobTrigger("test/{name}", Connection = "AzureWebJobsStorage")]Stream myBlob, string name, [Blob("test2/{name}.csv", FileAccess.Write, Connection = "AzureWebJobsStorage")] Stream outputBlob, TraceWriter log)
+        {
+            myBlob.Position = 0;
+            var str = StreamToString(myBlob);
+            var outputstring = jsonToCSV(str, ",");// add your logic to covert json to CSV
+            var stream = StringtoStream(outputstring);
+            stream.Position = 0;
+            stream.CopyTo(outputBlob);
+            log.Info($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
+        }
+
+        public static DataTable jsonStringToTable(string jsonContent)
+        {
+            DataTable dt = JsonConvert.DeserializeObject<DataTable>(jsonContent);
+            return dt;
+        }
+
+        public static string jsonToCSV(string jsonContent, string delimiter)
+        {
+            StringWriter csvString = new StringWriter();
+            using (var csv = new CsvWriter(csvString))
+            {
+
+                csv.Configuration.Delimiter = delimiter;
+
+                using (var dt = jsonStringToTable(jsonContent))
+                {
+
+                    foreach (DataColumn column in dt.Columns)
+                    {
+                        csv.WriteField(column.ColumnName);
+                    }
+                    csv.NextRecord();
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        for (var i = 0; i < dt.Columns.Count; i++)
+                        {
+                            csv.WriteField(row[i]);
+                        }
+                        csv.NextRecord();
+                    }
+                }
+            }
+
+            return csvString.ToString();
+        }
+        */
     }
 }
