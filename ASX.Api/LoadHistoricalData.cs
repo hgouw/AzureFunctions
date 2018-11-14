@@ -24,8 +24,8 @@ namespace ASX.Api
         // "0 */1 * * * *" - every minute
         public static void Run([TimerTrigger("*/5 * * * * *")]TimerInfo myTimer, TraceWriter log)
         {
-            var filename = "week201811016.zip";
-            var url = "https://www.asxhistoricaldata.com/data";
+            var url = CloudConfigurationManager.GetSetting("HistorialDataUrl");
+            var filename = CloudConfigurationManager.GetSetting("HistoricalDataFilename");
             if (CheckUrl(url + "\\" + filename))
             {
                 CheckBlobContainer();
@@ -45,7 +45,7 @@ namespace ASX.Api
             }
             else
             {
-                log.Info($"Unable to find the file {filename}");
+                log.Info($"Unable to locate the file {filename}");
             }
 
             if (myTimer.IsPastDue)
