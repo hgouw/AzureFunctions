@@ -24,7 +24,7 @@ namespace ASX.Api
         // "0 */1 * * * *" - every minute
         public static void Run([TimerTrigger("*/5 * * * * *")]TimerInfo myTimer, TraceWriter log)
         {
-            var filename = "week20181102.zip";
+            var filename = "week201811016.zip";
             var url = "https://www.asxhistoricaldata.com/data";
             if (CheckUrl(url + "\\" + filename))
             {
@@ -43,6 +43,10 @@ namespace ASX.Api
                     log.Info($"Error in downloading the file to {destination} - {ex.Message}");
                 }
             }
+            else
+            {
+                log.Info($"Unable to find the file {filename}");
+            }
 
             if (myTimer.IsPastDue)
             {
@@ -59,7 +63,7 @@ namespace ASX.Api
 
             try
             {
-                var response = request.GetResponse();
+                request.GetResponse();
             }
             catch
             {
