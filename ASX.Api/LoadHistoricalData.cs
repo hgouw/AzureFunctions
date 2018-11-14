@@ -26,20 +26,22 @@ namespace ASX.Api
         {
             var filename = "week20181102.zip";
             var url = "https://www.asxhistoricaldata.com/data";
-            var ok = CheckUrl(url + "\\" + filename);
-
-            try
+            if (CheckUrl(url + "\\" + filename))
             {
-                using (var client = new WebClient())
+                CheckBlobContainer();
+                var destination = Path.GetTempPath() + filename;
+                try
                 {
-                    var destination = Path.GetTempPath() + filename;
-                    log.Info($"Downloading the file to {destination}");
-                    //client.DownloadFile(url, destination);
+                    using (var client = new WebClient())
+                    {
+                        log.Info($"Downloading the file to {destination}");
+                        //client.DownloadFile(url, destination);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                log.Info($"Download Fail {ex.Message}");
+                catch (Exception ex)
+                {
+                    log.Info($"Error in downloading the file to {destination} - {ex.Message}");
+                }
             }
 
             if (myTimer.IsPastDue)
@@ -53,7 +55,7 @@ namespace ASX.Api
         {
             var urlCheck = new Uri(url);
             var request = WebRequest.Create(urlCheck);
-            request.Timeout = 15000;
+            request.Timeout = 1000; // 1000 milliseconds (1 second)
 
             try
             {
@@ -65,6 +67,14 @@ namespace ASX.Api
             }
 
             return true;
+        }
+        private static void CheckBlobContainer()
+        {
+            var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
+            var blobClient = storageAccount.CreateCloudBlobClient();
+
+            var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
+            blobContainer.CreateIfNotExists();
         }
     }
 }
