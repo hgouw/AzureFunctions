@@ -12,10 +12,17 @@ using System.Xml.Linq;
 namespace ASX.Api
 {
     // TO DO
-    // 1. Download the zip file
-    // 2. Unzip the zip file into txt 
-    // 3. Load the txt files into database
-    // 4. Remove the zip file and txt files
+    // 1. Get the last downloaded zip file info
+    // 2. Calculate if there is the latest zip file
+    // 3. Check if the latest zip file is available
+    // 4. If the latest zip file is available
+    //    a. Copy the zip file to blob container
+    //    b. Unzip the zip file to blob container
+    //    c. Load the txt files to database
+    //    d. Update the last download zip file info
+    //    e. Remove the zip file and txt files
+    //    f. Send message upon when loading is completed
+    // 5. If the latest zip file is not available then send message
 
     public static class LoadHistoricalData
     {
