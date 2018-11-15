@@ -1,6 +1,18 @@
 ﻿		var today = DateTime.Today;
 		var friday = today.AddDays(-(int)today.DayOfWeek).AddDays(5);
 
+        var date1 = new DateTime(2009, 8, 1, 0, 0, 0);
+        var date2 = new DateTime(2009, 8, 1, 12, 0, 0);
+        var result = DateTime.Compare(date1, date2);
+        var relationship = "";
+        if (result < 0)
+           relationship = "is earlier than";
+        else if (result == 0)
+           relationship = "is the same time as";         
+        else
+           relationship = "is later than";
+        Console.WriteLine("{0} {1} {2}", date1, relationship, date2);
+
 	public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/function")], HttpRequest req, ILogger log)
 	{
 		MemoryStream outputStream = new MemoryStream();
