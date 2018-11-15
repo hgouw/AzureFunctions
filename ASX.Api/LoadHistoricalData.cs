@@ -16,13 +16,14 @@ namespace ASX.Api
     // 2. Calculate if there is the latest zip file
     // 3. Check if the latest zip file is available
     // 4. If the latest zip file is available
-    //    a. Copy the zip file to blob container
-    //    b. Unzip the zip file to blob container
+    //    a. Copy the zip file to blob container (asx-zip)
+    //    b. Unzip the zip file to blob container (asx-txt)
     //    c. Load the txt files to database
-    //    d. Update the last download zip file info
+    //    d. Update the last download zip file info (asx-last)
     //    e. Remove the zip file and txt files
     //    f. Send message upon when loading is completed
     // 5. If the latest zip file is not available then send message
+    // Note: log files 
 
     public static class LoadHistoricalData
     {
@@ -84,8 +85,23 @@ namespace ASX.Api
             var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
             var blobClient = storageAccount.CreateCloudBlobClient();
 
-            var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
-            blobContainer.CreateIfNotExists();
+            var lastBlob = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("LastContainerName"));
+            lastBlob.CreateIfNotExists();
+
+            var zipBlob = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ZipContainerName"));
+            zipBlob.CreateIfNotExists();
+
+            var txtBlob = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("TxtContainerName"));
+            txtBlob.CreateIfNotExists();
+
+            var logBlob = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("LogContainerName"));
+            logBlob.CreateIfNotExists();
+        }
+
+        private static DateTime CurrentFriday()
+        {
+            var today = DateTime.Today;
+            return today.AddDays(-(int)today.DayOfWeek).AddDays(5);
         }
     }
 }

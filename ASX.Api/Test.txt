@@ -1,4 +1,7 @@
-﻿	public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/function")], HttpRequest req, ILogger log)
+﻿		var today = DateTime.Today;
+		var friday = today.AddDays(-(int)today.DayOfWeek).AddDays(5);
+
+	public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/function")], HttpRequest req, ILogger log)
 	{
 		MemoryStream outputStream = new MemoryStream();
 		StreamWriter writer = new StreamWriter(outputStream);
@@ -89,7 +92,6 @@
         StringWriter csvString = new StringWriter();
         using (var csv = new CsvWriter(csvString))
         {
-
             csv.Configuration.Delimiter = delimiter;
 
             using (var dt = jsonStringToTable(jsonContent))
