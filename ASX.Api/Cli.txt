@@ -25,7 +25,10 @@ SET AZURE_STORAGE_CONNECTION_STRING="<Azure Storage Settings>"
 az storage container create --name container1 --public-access blob
 
 # Set storage container permission
-az storage container set-permission --name  container1 --public-access container
+az storage container set-permission --name container1 --public-access container
+
+# Upload a file to a storage account container
+az storage upload --file c:\temp\test.txt --account-name hgouwdemo --container-name container1 --name test.txt -- type block --auth-mode login
 
 # Create function app
 az functionapp create --name hgouwdemo --resource-group hgouwdemo --storage-account hgouwdemo --consumption-plan-location  "AustraliaEast"
@@ -38,6 +41,11 @@ az group delete --name hgouwdemo
 AZURE_STORAGE_CONNECTION_STRING  
 AZURE_STORAGE_ACCOUNT
 AZURE_STORAGE_KEY
+
+StorageAccountName
+StorageAccountContainerName
+StorageAccountKey
+AzureAD_ClientSecret
 
 name='hgouwdemo'
 location='AustraliaEast'
@@ -53,5 +61,3 @@ az storage account create --name $name --resource-group $name --location $locati
 
 # Display storage account connection string
 az storage account show-connection-string --name $name --resource-group $name
-
-
