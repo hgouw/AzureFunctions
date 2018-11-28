@@ -7,6 +7,7 @@ using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -32,11 +33,12 @@ namespace ASX.Api
         [FunctionName("LoadHistoricalData")]
         // "*/5 * * * * *" - every 5 seconds
         // "0 */1 * * * *" - every minute
-        public static void Run([TimerTrigger("*/5 * * * * *")]TimerInfo myTimer, TraceWriter log)
+        // "0 */5 * * * *" - every 5 minutes
+        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, TraceWriter log)
         {
-            var url = CloudConfigurationManager.GetSetting("HistorialDataUrl");
             var filename = CloudConfigurationManager.GetSetting("HistoricalDataFilename");
-            if (CheckUrl(url + "\\" + filename))
+            var source = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "\\" + filename;
+            if (CheckUrl(source))
             {
                 CheckBlobContainer();
                 var destination = Path.GetTempPath() + filename;
@@ -45,7 +47,7 @@ namespace ASX.Api
                     using (var client = new WebClient())
                     {
                         log.Info($"Downloading the file to {destination}");
-                        //client.DownloadFile(url, destination);
+                        client.DownloadFile(source, destination);
                     }
                 }
                 catch (Exception ex)
@@ -69,7 +71,7 @@ namespace ASX.Api
         {
             var urlCheck = new Uri(url);
             var request = WebRequest.Create(urlCheck);
-            request.Timeout = 1000; // 1000 milliseconds (1 second)
+            request.Timeout = 1000; // 1000 milliseconds = 1 second
 
             try
             {
