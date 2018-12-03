@@ -38,10 +38,11 @@ namespace ASX.Api
         {
             var filename = CloudConfigurationManager.GetSetting("HistoricalDataFilename");
             var source = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "\\" + filename;
+            var destination = Path.GetTempPath() + filename;
+
             if (CheckUrl(source))
             {
                 CheckBlobContainer();
-                var destination = Path.GetTempPath() + filename;
                 try
                 {
                     using (var client = new WebClient())
