@@ -92,6 +92,7 @@ namespace ASX.Api
             var text = blockBlob2.DownloadText();
         }
 
+        // Return the Friday of the current week
         private static DateTime CurrentFriday()
         {
             var today = DateTime.Today;
