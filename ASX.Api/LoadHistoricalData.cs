@@ -38,22 +38,15 @@ namespace ASX.Api
         {
             var filename = CloudConfigurationManager.GetSetting("HistoricalDataFilename");
             var source = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "\\" + filename;
-            var destination = Path.GetTempPath() + filename;
-
             if (CheckUrl(source))
             {
-                CheckBlobContainer();
                 try
                 {
-                    using (var client = new WebClient())
-                    {
-                        log.Info($"Downloading the file to {destination}");
-                        client.DownloadFile(source, destination);
-                    }
+                    CheckBlobContainer(source, filename);
                 }
                 catch (Exception ex)
                 {
-                    log.Info($"Error in downloading the file to {destination} - {ex.Message}");
+                    log.Info($"Error in downloading {source} - {ex.Message}");
                 }
             }
             else
@@ -85,22 +78,18 @@ namespace ASX.Api
 
             return true;
         }
-        private static void CheckBlobContainer()
+        private static void CheckBlobContainer(string url, string filename)
         {
             var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
             var blobClient = storageAccount.CreateCloudBlobClient();
 
-            var lastBlob = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("LastContainerName"));
-            lastBlob.CreateIfNotExists();
-
-            var zipBlob = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ZipContainerName"));
-            zipBlob.CreateIfNotExists();
-
-            var txtBlob = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("TxtContainerName"));
-            txtBlob.CreateIfNotExists();
-
-            var logBlob = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("LogContainerName"));
-            logBlob.CreateIfNotExists();
+            var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
+            blobContainer.CreateIfNotExists();
+            var blockBlob1 = blobContainer.GetBlockBlobReference(filename);
+            var blockBlob2 = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("FileName"));
+            blockBlob1.StartCopy(new Uri(url), null, null, null);
+            blockBlob2.UploadText(filename);
+            var text = blockBlob2.DownloadText();
         }
 
         private static DateTime CurrentFriday()
