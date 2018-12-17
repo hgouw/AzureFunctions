@@ -1,7 +1,6 @@
 using Microsoft.Azure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
-//using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -34,9 +33,9 @@ namespace ASX.Api
         // "*/5 * * * * *" - every 5 seconds
         // "0 */1 * * * *" - every minute
         // "0 */5 * * * *" - every 5 minutes
-        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, TraceWriter log)
         {
-            var filename = CloudConfigurationManager.GetSetting("HistoricalDataFilename");
+            var filename = CloudConfigurationManager.GetSetting("HistoricalDataFileName");
             var source = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "\\" + filename;
             if (CheckUrl(source))
             {
@@ -88,7 +87,8 @@ namespace ASX.Api
             var blockBlob1 = blobContainer.GetBlockBlobReference(filename);
             var blockBlob2 = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("FileName"));
             blockBlob1.StartCopy(new Uri(url), null, null, null);
-            blockBlob2.UploadText(filename);
+            blockBlob2.UploadText(CurrentFriday().ToString("weekyyyyMMdd"));
+            //blockBlob2.UploadText(Path.GetFileNameWithoutExtension(filename));
             var text = blockBlob2.DownloadText();
         }
 
@@ -97,6 +97,11 @@ namespace ASX.Api
         {
             var today = DateTime.Today;
             return today.AddDays(-(int)today.DayOfWeek).AddDays(5);
+        }
+
+        private static string FileNameWithoutExtension(string filename)
+        {
+            return Path.GetFileNameWithoutExtension(filename);
         }
     }
 }
