@@ -77,6 +77,43 @@ namespace ASX.Api
 
             return true;
         }
+        private static string DownloadBlobContainer()
+        {
+            var text = "";
+
+            try
+            {
+                var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
+                var blobClient = storageAccount.CreateCloudBlobClient();
+                var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
+                var lastBlockBlob = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("BlockBlob"));
+                text = lastBlockBlob.DownloadText();
+            }
+            catch
+            {
+
+                return text;
+            }
+
+            return text;
+        }
+
+        private static void UploadBlobContainer(string text)
+        {
+            try
+            {
+                var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
+                var blobClient = storageAccount.CreateCloudBlobClient();
+                var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
+                var lastBlockBlob = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("BlockBlob"));
+                lastBlockBlob.UploadText(text);
+            }
+            catch
+            {
+                // log the error message
+            }
+        }
+
         private static void CheckBlobContainer(string url, string filename)
         {
             var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
