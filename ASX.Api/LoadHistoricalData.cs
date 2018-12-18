@@ -2,15 +2,9 @@ using Microsoft.Azure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Globalization;
-using System.IO;
-using System.IO.Compression;
 using System.Net;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ASX.Api
 {
