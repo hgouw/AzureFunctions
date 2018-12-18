@@ -5,6 +5,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -35,29 +36,28 @@ namespace ASX.Api
         // "0 */5 * * * *" - every 5 minutes
         public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, TraceWriter log)
         {
-            var filename = CloudConfigurationManager.GetSetting("HistoricalDataFileName");
-            var source = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "\\" + filename;
-            if (CheckUrl(source))
-            {
-                try
-                {
-                    CheckBlobContainer(source, filename);
-                }
-                catch (Exception ex)
-                {
-                    log.Info($"Error in downloading {source} - {ex.Message}");
-                }
-            }
-            else
-            {
-                log.Info($"Unable to locate the file {filename}");
-            }
-
             if (myTimer.IsPastDue)
             {
                 log.Info("Timer is running late!");
             }
-            log.Info($"C# Timer trigger function executed at: {DateTime.Now}");
+
+            var last = DateTime.ParseExact(CheckBlobContainer(), "yyyyMMdd", CultureInfo.InvariantCulture);
+            while (last < CurrentFriday())
+            {
+                last = last.AddDays(7);
+                var source = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "/" + last.ToString("weekyyyyMMdd") + ".zip";
+                if (CheckUrl(source))
+                {
+                    UpdateBlobContainer(last.ToString("yyyyMMdd"));
+                }
+                else
+                {
+                    log.Info($"Unable to locate the file {source} at {DateTime.Now}");
+                }
+            }
+
+            log.Info($"C# Timer trigger function executed at {DateTime.Now}");
+            //log.Info($"Error in downloading {source} - {ex.Message}");
         }
 
         private static bool CheckUrl(string url)
@@ -77,7 +77,7 @@ namespace ASX.Api
 
             return true;
         }
-        private static string DownloadBlobContainer()
+        private static string CheckBlobContainer()
         {
             var text = "";
 
@@ -92,41 +92,28 @@ namespace ASX.Api
             catch
             {
 
-                return text;
+                // log the exception message
             }
 
             return text;
         }
 
-        private static void UploadBlobContainer(string text)
+        private static void UpdateBlobContainer(string text)
         {
             try
             {
                 var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
                 var blobClient = storageAccount.CreateCloudBlobClient();
                 var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
+                blobContainer.CreateIfNotExists();
                 var lastBlockBlob = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("BlockBlob"));
                 lastBlockBlob.UploadText(text);
+                //lastBlockBlob.StartCopy(new Uri(url), null, null, null);
             }
             catch
             {
-                // log the error message
+                // log the exception message
             }
-        }
-
-        private static void CheckBlobContainer(string url, string filename)
-        {
-            var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
-            var blobClient = storageAccount.CreateCloudBlobClient();
-
-            var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
-            blobContainer.CreateIfNotExists();
-            var blockBlob1 = blobContainer.GetBlockBlobReference(filename);
-            var blockBlob2 = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("FileName"));
-            blockBlob1.StartCopy(new Uri(url), null, null, null);
-            blockBlob2.UploadText(CurrentFriday().ToString("weekyyyyMMdd"));
-            //blockBlob2.UploadText(Path.GetFileNameWithoutExtension(filename));
-            var text = blockBlob2.DownloadText();
         }
 
         // Return the Friday of the current week
