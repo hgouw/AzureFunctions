@@ -41,23 +41,26 @@ namespace ASX.Api
                 log.Info("Timer is running late!");
             }
 
-            var last = DateTime.ParseExact(CheckBlobContainer(), "yyyyMMdd", CultureInfo.InvariantCulture);
+            var last = DateTime.ParseExact(CheckBlobContainer(log), "yyyyMMdd", CultureInfo.InvariantCulture);
             while (last < CurrentFriday())
             {
                 last = last.AddDays(7);
-                var source = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "/" + last.ToString("weekyyyyMMdd") + ".zip";
-                if (CheckUrl(source))
+                var filename = last.ToString("weekyyyyMMdd") + ".zip";
+                var url = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "/" + filename;
+                if (CheckUrl(url))
                 {
-                    UpdateBlobContainer(last.ToString("yyyyMMdd"));
+                    if (ProcessBlobContainer(filename, url, log))
+                    {
+                        UpdateBlobContainer(last.ToString("yyyyMMdd"), log);
+                    }
                 }
                 else
                 {
-                    log.Info($"Unable to locate the file {source} at {DateTime.Now}");
+                    log.Info($"Unable to locate the file {url} at {DateTime.Now}");
                 }
             }
 
             log.Info($"C# Timer trigger function executed at {DateTime.Now}");
-            //log.Info($"Error in downloading {source} - {ex.Message}");
         }
 
         private static bool CheckUrl(string url)
@@ -77,7 +80,7 @@ namespace ASX.Api
 
             return true;
         }
-        private static string CheckBlobContainer()
+        private static string CheckBlobContainer(TraceWriter log)
         {
             var text = "";
 
@@ -89,16 +92,35 @@ namespace ASX.Api
                 var lastBlockBlob = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("BlockBlob"));
                 text = lastBlockBlob.DownloadText();
             }
-            catch
+            catch (Exception ex)
             {
-
-                // log the exception message
+                log.Info($"Error in CheckBlobContainer - {ex.Message}");
             }
 
             return text;
         }
 
-        private static void UpdateBlobContainer(string text)
+        private static bool ProcessBlobContainer(string filename, string url, TraceWriter log)
+        {
+            try
+            {
+                var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
+                var blobClient = storageAccount.CreateCloudBlobClient();
+                var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
+                blobContainer.CreateIfNotExists();
+                var zipBlockBlob = blobContainer.GetBlockBlobReference(filename);
+                zipBlockBlob.StartCopy(new Uri(url), null, null, null);
+            }
+            catch (Exception ex)
+            {
+                log.Info($"Error in ProcessBlobContainer - {ex.Message}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static void UpdateBlobContainer(string text, TraceWriter log)
         {
             try
             {
@@ -108,11 +130,10 @@ namespace ASX.Api
                 blobContainer.CreateIfNotExists();
                 var lastBlockBlob = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("BlockBlob"));
                 lastBlockBlob.UploadText(text);
-                //lastBlockBlob.StartCopy(new Uri(url), null, null, null);
             }
-            catch
+            catch (Exception ex)
             {
-                // log the exception message
+                log.Info($"Error in UpdateBlobContainer - {ex.Message}");
             }
         }
 
@@ -121,11 +142,6 @@ namespace ASX.Api
         {
             var today = DateTime.Today;
             return today.AddDays(-(int)today.DayOfWeek).AddDays(5);
-        }
-
-        private static string FileNameWithoutExtension(string filename)
-        {
-            return Path.GetFileNameWithoutExtension(filename);
         }
     }
 }
