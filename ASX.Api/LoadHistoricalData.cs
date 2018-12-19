@@ -33,7 +33,7 @@ namespace ASX.Api
         // "0 */5 * * * *" - every 5 minutes
         // "0 */1 * * * *" - every minute
         // "*/5 * * * * *" - every 5 seconds
-        public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, TraceWriter log)
         {
             if (myTimer.IsPastDue)
             {
