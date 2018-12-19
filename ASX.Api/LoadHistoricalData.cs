@@ -25,6 +25,7 @@ namespace ASX.Api
     public static class LoadHistoricalData
     {
         [FunctionName("LoadHistoricalData")]
+        // https://codehollow.com/2017/02/azure-functions-time-trigger-cron-cheat-sheet/
         // "0 30 9 * * *"  - every day at 9.30AM
         // "0 0 6 * * *"   - every day at 6AM
         // "0 0 */6 * * *" - every 6 hours
