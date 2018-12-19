@@ -25,15 +25,20 @@ namespace ASX.Api
     public static class LoadHistoricalData
     {
         [FunctionName("LoadHistoricalData")]
-        // "*/5 * * * * *" - every 5 seconds
-        // "0 */1 * * * *" - every minute
+        // "0 30 9 * * *"  - every day at 9.30AM
+        // "0 0 6 * * *"   - every day at 6AM
+        // "0 0 */6 * * *" - every 6 hours
+        // "0 0 * * * *"   - every hour
         // "0 */5 * * * *" - every 5 minutes
+        // "0 */1 * * * *" - every minute
+        // "*/5 * * * * *" - every 5 seconds
         public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, TraceWriter log)
         {
             if (myTimer.IsPastDue)
             {
                 log.Info("Timer is running late!");
             }
+            log.Info($"C# Timer trigger function executed at {DateTime.Now}");
 
             var last = DateTime.ParseExact(CheckBlobContainer(log), "yyyyMMdd", CultureInfo.InvariantCulture);
             while (last < CurrentFriday())
@@ -54,8 +59,6 @@ namespace ASX.Api
                     log.Info($"Unable to locate the file {url} at {DateTime.Now}");
                 }
             }
-
-            log.Info($"C# Timer trigger function executed at {DateTime.Now}");
         }
 
         private static bool CheckUrl(string url)
