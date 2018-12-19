@@ -46,6 +46,7 @@ namespace ASX.Api
                     if (ProcessBlobContainer(filename, url, log))
                     {
                         UpdateBlobContainer(last.ToString("yyyyMMdd"), log);
+                        log.Info($"Successfully processed the file {url} at {DateTime.Now}");
                     }
                 }
                 else
