@@ -41,17 +41,18 @@ namespace ASX.Api
             }
             log.Info($"C# Timer trigger function executed at {DateTime.Now}");
 
-            var last = DateTime.ParseExact(CheckBlobContainer(log), "yyyyMMdd", CultureInfo.InvariantCulture);
+            var dateFormat = CloudConfigurationManager.GetSetting("DateFormat");
+            var last = DateTime.ParseExact(CheckBlobContainer(log), dateFormat, CultureInfo.InvariantCulture);
             while (last < CurrentFriday())
             {
                 last = last.AddDays(7);
-                var filename = last.ToString("weekyyyyMMdd") + ".zip";
+                var filename = "week" + last.ToString(dateFormat) + ".zip";
                 var url = CloudConfigurationManager.GetSetting("HistorialDataUrl") + "/" + filename;
                 if (CheckUrl(url))
                 {
                     if (ProcessBlobContainer(filename, url, log))
                     {
-                        UpdateBlobContainer(last.ToString("yyyyMMdd"), log);
+                        UpdateBlobContainer(last.ToString(dateFormat), log);
                         log.Info($"Successfully processed the file {url} at {DateTime.Now}");
                     }
                 }
