@@ -1,0 +1,51 @@
+# Create a username and generate a random password
+USERNAME=azureuser
+PASSWORD=$(openssl rand -base64 32)
+
+# Creates the VM in the "East US" location
+az vm create \
+  --name myVM \
+  --resource-group 81b795a6-b791-49b5-9fe0-1779bf99a3ff \
+  --image Win2016Datacenter \
+  --size Standard_DS2_v2 \
+  --location eastus \
+  --admin-username $USERNAME \
+  --admin-password $PASSWORD
+
+# Verify that the VM was successfully created and is running
+az vm get-instance-view \
+  --name myVM \
+  --resource-group 81b795a6-b791-49b5-9fe0-1779bf99a3ff \
+  --output table
+
+# Install IIS and configure a basic home page
+az vm extension set \
+  --resource-group 81b795a6-b791-49b5-9fe0-1779bf99a3ff \
+  --vm-name myVM \
+  --name CustomScriptExtension \
+  --publisher Microsoft.Compute \
+  --settings '{"fileUris":["https://raw.githubusercontent.com/MicrosoftDocs/mslearn-welcome-to-azure/master/configure-iis.ps1"]}' \
+  --protected-settings '{"commandToExecute": "powershell -ExecutionPolicy Unrestricted -File configure-iis.ps1"}'
+  
+# Open port 80 (HTTP) through the firewall
+az vm open-port \
+  --name myVM \
+  --resource-group 81b795a6-b791-49b5-9fe0-1779bf99a3ff \
+  --port 80
+  
+# List your VM's public IP address
+az vm show \
+  --name myVM \
+  --resource-group 81b795a6-b791-49b5-9fe0-1779bf99a3ff \
+  --show-details \
+  --query [publicIps] \
+  --output tsv
+
+
+
+
+
+
+
+
+
