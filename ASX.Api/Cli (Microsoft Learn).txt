@@ -41,11 +41,17 @@ az vm show \
   --query [publicIps] \
   --output tsv
 
+# Increase your VM's size to Standard_DS3_v2
+az vm resize \
+  --resource-group 51f8b8b8-8d1e-460d-b6df-01976f486c46 \
+  --name myVM \
+  --size Standard_DS3_v2
 
+# Verify that your VM is running the new size
+az vm show \
+  --resource-group 51f8b8b8-8d1e-460d-b6df-01976f486c46 \
+  --name myVM \
+  --query "hardwareProfile" \
+  --output tsv
 
-
-
-
-
-
-
+# You can delete resources one by one, or just delete the resource group to get rid of the entire set.
