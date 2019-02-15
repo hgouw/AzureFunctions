@@ -55,3 +55,16 @@ az vm show \
   --output tsv
 
 # You can delete resources one by one, or just delete the resource group to get rid of the entire set.
+
+================================================================================================================================================
+
+# Getting started with Azure Kubernetes Service (AKS)
+
+# Create a Kubernetes cluster
+az aks create -n $NAME -g $GROUP
+
+# Install kubectl tool to manage the cluster
+az aks install-cli
+
+# Configure kubectl to securely connect
+# az aks get-credentials create -n $NAME -g $GROUP 
