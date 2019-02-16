@@ -25,15 +25,18 @@ namespace ASX.Api
     public static class LoadHistoricalData
     {
         [FunctionName("LoadHistoricalData")]
+        // https://en.wikipedia.org/wiki/Cron
         // https://codehollow.com/2017/02/azure-functions-time-trigger-cron-cheat-sheet/
-        // "0 30 9 * * *"  - every day at 9.30AM
-        // "0 0 6 * * *"   - every day at 6AM
+        // http://www.openjs.com/scripts/jslibrary/demos/crontab.php
+        // "30 9  * * *"  - every day at 9.30AM
+        // "0  6  * * *"   - every day at 6AM
+        // "0 18  * * *"   - every day at 6PM
         // "0 0 */6 * * *" - every 6 hours
         // "0 0 * * * *"   - every hour
         // "0 */5 * * * *" - every 5 minutes
         // "0 */1 * * * *" - every minute
         // "*/5 * * * * *" - every 5 seconds
-        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static void Run([TimerTrigger("0 18  * * *")]TimerInfo myTimer, TraceWriter log)
         {
             if (myTimer.IsPastDue)
             {
