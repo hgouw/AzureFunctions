@@ -68,3 +68,72 @@ az aks install-cli
 
 # Configure kubectl to securely connect
 # az aks get-credentials create -n $NAME -g $GROUP 
+
+
+================================================================================================================================================
+
+# Create your vault
+az keyvault create \
+    --resource-group e3c4d2ef-bf7b-4ea9-ad32-c942533994bb \
+    --name "hgouwdemo"
+
+# Add the secret: our secret will be named SecretPassword with a value of reindeer_flotilla
+az keyvault secret set \
+    --name SecretPassword \
+    --value reindeer_flotilla \
+    --vault-name "hgouwdemo"
+
+# Create a new ASP.NET Core web API application and open it in the editor
+dotnet new webapi -o KeyVaultDemoApp
+cd KeyVaultDemoApp
+code .
+
+# Add the NuGet package containing AddAzureKeyVault and restore all of the app's dependencies
+dotnet add package Microsoft.Extensions.Configuration.AzureKeyVault -v 2.1.1
+dotnet restore
+
+touch Controllers/SecretTestController.cs
+dotnet build
+
+# Create an App Service plan
+az appservice plan create \
+    --name keyvault-exercise-plan \
+    --resource-group e3c4d2ef-bf7b-4ea9-ad32-c942533994bb
+	
+# Create the Web App that uses the App Service plan you just created
+az webapp create \
+    --plan keyvault-exercise-plan \
+    --resource-group e3c4d2ef-bf7b-4ea9-ad32-c942533994bb \
+    --name "hgouwdemo"
+
+# Create the application setting
+az webapp config appsettings set \
+    --resource-group e3c4d2ef-bf7b-4ea9-ad32-c942533994bb \
+    --name "hgouwdemo" \
+    --settings 'VaultName=hgouwdemo'
+
+# Enable managed identity on the app
+az webapp identity assign \
+    --resource-group e3c4d2ef-bf7b-4ea9-ad32-c942533994bb \
+    --name "hgouwdemo"
+
+# Assign Key Vault permissions to your app's managed identity
+# Use the principalId value you copied from the previous step as the value for object-id in the command below
+az keyvault set-policy \
+    --secret-permissions get list \
+    --name "hgouwdemo" \
+    --object-id <your-managed-identity-principleid>
+	
+# Deploy the app
+dotnet publish -o pub
+zip -j site.zip pub/*
+
+az webapp deployment source config-zip \
+    --src site.zip \
+    --resource-group e3c4d2ef-bf7b-4ea9-ad32-c942533994bb \
+    --name "hgouwdemo"
+
+# To cleanup your Cloud Shell storage, delete the KeyVaultDemoApp directory
+
+
+
