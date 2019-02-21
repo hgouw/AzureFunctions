@@ -1,4 +1,5 @@
-﻿		var today = DateTime.Today;
+﻿	{
+		var today = DateTime.Today;
 		var friday = today.AddDays(-(int)today.DayOfWeek).AddDays(5);
 
         var date1 = new DateTime(2009, 8, 1, 0, 0, 0);
@@ -12,6 +13,7 @@
         else
            relationship = "is later than";
         Console.WriteLine("{0} {1} {2}", date1, relationship, date2);
+	}
 
 	public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/function")], HttpRequest req, ILogger log)
 	{
