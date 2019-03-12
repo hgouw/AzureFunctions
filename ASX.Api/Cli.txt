@@ -57,10 +57,13 @@ az storage upload --file c:\temp\test.txt --account-name hgouwdemo --container-n
 # Create function app
 az functionapp create --name hgouwdemo --resource-group hgouwdemo --storage-account hgouwdemo --consumption-plan-location  "AustraliaEast"
 
-#Stop the function app
+# Update the FUNCTIONS_EXTENSION_VERSION setting in the function app
+az functionapp config appsettings set --name hgouwdemo --resource-group hgouwdemo --settings FUNCTIONS_EXTENSION_VERSION=~2
+
+# Stop the function app
 az functionapp stop --name hgouwdemo --resource-group hgouwdemo
 
-#Delete a resource group
+# Delete a resource group
 az group delete --name hgouwdemo
 
 ==============================================================================================================================================================
