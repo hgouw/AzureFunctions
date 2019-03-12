@@ -54,10 +54,13 @@ az storage container set-permission --name container1 --public-access container
 # Upload a file to a storage account container
 az storage upload --file c:\temp\test.txt --account-name hgouwdemo --container-name container1 --name test.txt -- type block --auth-mode login
 
-# Create function app
+# Create the function app
 az functionapp create --name hgouwdemo --resource-group hgouwdemo --storage-account hgouwdemo --consumption-plan-location  "AustraliaEast"
 
-# Update the FUNCTIONS_EXTENSION_VERSION setting in the function app
+# View the function app's current runtime version
+az functionapp config appsettings list --name hgouwdemo --resource-group hgouwdemo
+
+# Update the function app's runtime version
 az functionapp config appsettings set --name hgouwdemo --resource-group hgouwdemo --settings FUNCTIONS_EXTENSION_VERSION=~2
 
 # Stop the function app
