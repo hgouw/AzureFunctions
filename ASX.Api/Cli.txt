@@ -80,17 +80,21 @@ StorageAccountContainerName
 StorageAccountKey
 AzureAD_ClientSecret
 
-name='hgouwdemo'
-location='AustraliaEast'
+NAME='hgouwdemo'
+LOCATION='AustraliaEast'
+RESOURCE_GROUP='hgouwdemo'
 
 # Login to Azure
 az login
 
 # Create a resource group
-az group create --name  $name --location $location
+az group create --name  $NAME --location $LOCATION
 
 # Create a storage account
-az storage account create --name $name --resource-group $name --location $location --kind StorageV2 --sku Standard_LRS
+az storage account create --name $NAME --resource-group $RESOURCE_GROUP --location $location --kind StorageV2 --sku Standard_LRS
 
 # Display storage account connection string
-az storage account show-connection-string --name $name --resource-group $name
+az storage account show-connection-string --name $NAME --resource-group $RESOURCE_GROUP
+
+# Delete a resource group
+az group delete --name $NAME
