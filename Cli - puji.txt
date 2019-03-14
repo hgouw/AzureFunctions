@@ -7,11 +7,14 @@ RESOURCE_GROUP='puji'
 # Create a resource group
 az group create --name  $NAME --location $LOCATION
 
-# Create a storage account
-az storage account create --name $NAME --resource-group $RESOURCE_GROUP --location $LOCATION --kind StorageV2 --sku Standard_LRS
+# Create an App Service plan
+az appservice plan create --name $NAME --resource-group $RESOURCE_GROUP --location $LOCATION
 
-# Display storage account connection string
-az storage account show-connection-string --name $NAME --resource-group $RESOURCE_GROUP
+# Create the web app
+az webapp create --name $NAME --resource-group $RESOURCE_GROUP --plan $LOCATION
+
+# Deploy code from a GitHub repository to the web app
+az webapp deployment source config --name $NAME --resource-group $RESOURCE_GROUP --repo-url "https://github.com/hgouw/Puji" --branch master --manual-integration
 
 # Delete a resource group
 az group delete --name $RESOURCE_GROUP
