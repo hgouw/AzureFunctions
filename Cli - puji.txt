@@ -1,0 +1,17 @@
+#!/bin/bash
+
+NAME='puji'
+LOCATION='AustraliaEast'
+RESOURCE_GROUP='puji'
+
+# Create a resource group
+az group create --name  $NAME --location $LOCATION
+
+# Create a storage account
+az storage account create --name $NAME --resource-group $RESOURCE_GROUP --location $LOCATION --kind StorageV2 --sku Standard_LRS
+
+# Display storage account connection string
+az storage account show-connection-string --name $NAME --resource-group $RESOURCE_GROUP
+
+# Delete a resource group
+az group delete --name $RESOURCE_GROUP
