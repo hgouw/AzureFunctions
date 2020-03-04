@@ -2,7 +2,6 @@ using Microsoft.Azure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -22,29 +21,34 @@ namespace ASX.Api
             {
                 if (name.Split('.').Last().ToLower() == "zip")
                 {
-                    var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
-                    var blobClient = storageAccount.CreateCloudBlobClient();
-                    var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerName"));
                     using (var memoryStream = new MemoryStream())
                     {
-                        await myBlob.CopyToAsync(memoryStream);
-                        using (var archive = new ZipArchive(memoryStream))
+                        using (var archive = new ZipArchive(myBlob))
                         {
+                            var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
+                            var blobClient = storageAccount.CreateCloudBlobClient();
+                            var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerDataName"));
+                            blobContainer.CreateIfNotExists();
+
                             foreach (var entry in archive.Entries)
                             {
-                                log.Info($"Unzipping {entry.FullName}");
-                                using (var fileStream = entry.Open())
+                                if (!string.IsNullOrEmpty(entry.Name))
                                 {
-                                    //await myBlob.WriteAsync(fileStream);
+                                    log.Info($"Unzipping file {entry.Name} at {DateTime.Now}");
+                                    var blob = blobContainer.GetBlockBlobReference(entry.Name);
+                                    using (var fileStream = entry.Open())
+                                    {
+                                        await blob.UploadFromStreamAsync(fileStream);
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                log.Info($"Unable to unzip the file {name} at {DateTime.Now}");
+                log.Info($"Unable to unzip the file {name} at {DateTime.Now} - {ex.Message}");
             }
         }
     }
