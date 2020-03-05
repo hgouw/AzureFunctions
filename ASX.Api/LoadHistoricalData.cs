@@ -122,9 +122,9 @@ namespace ASX.Api
             {
                 var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
                 var blobClient = storageAccount.CreateCloudBlobClient();
-                var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerLastName"));
+                var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("LastContainerName"));
                 blobContainer.CreateIfNotExists();
-                var blockBlob = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("BlockLastBlob"));
+                var blockBlob = blobContainer.GetBlockBlobReference(CloudConfigurationManager.GetSetting("LastBlockBlob"));
                 blockBlob.UploadText(text);
             }
             catch (Exception ex)
