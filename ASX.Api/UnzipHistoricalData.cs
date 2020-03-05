@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace ASX.Api
 {
+    // 1. Check the file dropped in blob container (asx-zip)
+    // 2. If it is a zip file then unzip the zip file to blob container (asx-text)
     public static class UnzipHistoricalData
     {
         [FunctionName("UnzipHistoricalData")]

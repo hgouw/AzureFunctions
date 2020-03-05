@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace ASX.Api
 {
+    // 1. Check the file dropped in blob container (asx-text)
+    // 2. If it is a txt file then load the txt file to database
     public static class StoreHistoricalData
     {
         [FunctionName("StoreHistoricalData")]
