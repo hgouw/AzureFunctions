@@ -10,7 +10,7 @@ namespace ASX.Api
     public static class StoreHistoricalData
     {
         [FunctionName("StoreHistoricalData")]
-        public static async Task Run([BlobTrigger("asx-data/{name}", Connection = "AzureWebJobsStorage")]Stream myBlob, string name, TraceWriter log)
+        public static async Task Run([BlobTrigger("asx-text/{name}", Connection = "AzureWebJobsStorage")]Stream myBlob, string name, TraceWriter log)
         {
             log.Info($"C# Blob trigger function executed at {DateTime.Now} to process blob {name} of {myBlob.Length} bytes");
 
@@ -22,7 +22,7 @@ namespace ASX.Api
                     /*
                     var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
                     var blobClient = storageAccount.CreateCloudBlobClient();
-                    var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("ContainerDataName"));
+                    var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("TextContainerName"));
                     */
                     await Task.Delay(1);
                 }
