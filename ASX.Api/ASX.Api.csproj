@@ -22,4 +22,8 @@
   <ItemGroup>
     <Folder Include="assets\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ASX.BusinessLayer\ASX.BusinessLayer.csproj" />
+    <ProjectReference Include="..\ASX.DataAccess\ASX.DataAccess.csproj" />
+  </ItemGroup>
 </Project>
