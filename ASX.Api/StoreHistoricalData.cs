@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.WindowsAzure.Storage;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -41,22 +42,28 @@ namespace ASX.Api
         {
             try
             {
-                var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
-                var blobClient = storageAccount.CreateCloudBlobClient();
-                var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("TextContainerName"));
-                var blockBlob = blobContainer.GetBlockBlobReference(filename);
-                var lines = blockBlob.DownloadTextAsync().Result.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                var csv = lines.Select(l => l.Split(',')).ToArray();
-                var endOfDays = csv.Select(x => new EndOfDay()
+                using (var db = new ASXDbContext())
                 {
-                    Code = x[0],
-                    Date = DateTime.ParseExact(x[1], "yyyyMMdd", CultureInfo.InvariantCulture),
-                    Open = Decimal.Parse(x[2]),
-                    High = Decimal.Parse(x[3]),
-                    Low = Decimal.Parse(x[4]),
-                    Close = Decimal.Parse(x[5]),
-                    Volume = Int64.Parse(x[6])
-                });
+                    var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
+                    var blobClient = storageAccount.CreateCloudBlobClient();
+                    var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("TextContainerName"));
+                    var blockBlob = blobContainer.GetBlockBlobReference(filename);
+                    var lines = blockBlob.DownloadTextAsync().Result.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    var csv = lines.Select(l => l.Split(',')).ToArray();
+                    var endOfDays = csv.Select(x => new EndOfDay()
+                    {
+                        Code = x[0],
+                        Date = DateTime.ParseExact(x[1], "yyyyMMdd", CultureInfo.InvariantCulture),
+                        Open = Decimal.Parse(x[2]),
+                        High = Decimal.Parse(x[3]),
+                        Low = Decimal.Parse(x[4]),
+                        Close = Decimal.Parse(x[5]),
+                        Volume = Int64.Parse(x[6])
+                    });
+                    IList<WatchList> _watchLists = ASXDbContext.GetWatchLists();
+                    IList<EndOfDay> _endOfDays = endOfDays.Where(a => _watchLists.Any(w => w.Code == a.Code)).OrderBy(w => w.Date).ToList(); // Select the EndOfDays in WatchLists only
+                    db.EndOfDays.AddRange(_endOfDays);
+                }
             }
             catch (Exception ex)
             {
