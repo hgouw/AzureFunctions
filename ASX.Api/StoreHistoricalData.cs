@@ -63,6 +63,7 @@ namespace ASX.Api
                     IList<WatchList> _watchLists = ASXDbContext.GetWatchLists();
                     IList<EndOfDay> _endOfDays = endOfDays.Where(a => _watchLists.Any(w => w.Code == a.Code)).OrderBy(w => w.Date).ToList(); // Select the EndOfDays in WatchLists only
                     db.EndOfDays.AddRange(_endOfDays);
+                    SaveDatabaseAsync(db, log);
                 }
             }
             catch (Exception ex)
@@ -72,6 +73,19 @@ namespace ASX.Api
             }
 
             return true;
+        }
+
+        private static async void SaveDatabaseAsync(ASXDbContext db, TraceWriter log)
+        {
+            try
+            {
+                await db.SaveChangesAsync();
+                log.Info($"Successfully saving database at {DateTime.Now}");
+            }
+            catch (Exception ex)
+            {
+                log.Info($"Error in SaveDatabaseAsync - {ex.InnerException.InnerException.Message}");
+            };
         }
     }
 }
