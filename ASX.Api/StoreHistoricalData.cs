@@ -1,9 +1,14 @@
+using Microsoft.Azure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.WindowsAzure.Storage;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ASX.BusinessLayer;
+using ASX.DataAccess;
 
 namespace ASX.Api
 {
@@ -21,11 +26,8 @@ namespace ASX.Api
                 if (name.Split('.').Last().ToLower() == "txt")
                 {
                     log.Info($"Storing file {name} at {DateTime.Now}");
-                    /*
-                    var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
-                    var blobClient = storageAccount.CreateCloudBlobClient();
-                    var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("TextContainerName"));
-                    */
+
+                    LoadTextFile(name, log);
                     await Task.Delay(1);
                 }
             }
@@ -33,6 +35,36 @@ namespace ASX.Api
             {
                 log.Info($"Unable to store the file {name} at {DateTime.Now} - {ex.Message}");
             }
+        }
+
+        private static bool LoadTextFile(string filename, TraceWriter log)
+        {
+            try
+            {
+                var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("AzureWebJobsStorage"));
+                var blobClient = storageAccount.CreateCloudBlobClient();
+                var blobContainer = blobClient.GetContainerReference(CloudConfigurationManager.GetSetting("TextContainerName"));
+                var blockBlob = blobContainer.GetBlockBlobReference(filename);
+                var lines = blockBlob.DownloadTextAsync().Result.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                var csv = lines.Select(l => l.Split(',')).ToArray();
+                var endOfDays = csv.Select(x => new EndOfDay()
+                {
+                    Code = x[0],
+                    Date = DateTime.ParseExact(x[1], "yyyyMMdd", CultureInfo.InvariantCulture),
+                    Open = Decimal.Parse(x[2]),
+                    High = Decimal.Parse(x[3]),
+                    Low = Decimal.Parse(x[4]),
+                    Close = Decimal.Parse(x[5]),
+                    Volume = Int64.Parse(x[6])
+                });
+            }
+            catch (Exception ex)
+            {
+                log.Info($"Error in LoadTextFile - {ex.Message}");
+                return false;
+            }
+
+            return true;
         }
     }
 }
