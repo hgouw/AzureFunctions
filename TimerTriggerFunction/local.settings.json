@@ -1,7 +1,0 @@
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=hgouwtest;AccountKey=rF/PDO/oLWSBARRnwhi6OYA9jt0CPjXc/+Lp2Vm5zSxIH3uwgGwy8fG1MHbo2vIlbez0G/0/3U6WMKtqRCFs4A==",
-    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=hgouwtest;AccountKey=rF/PDO/oLWSBARRnwhi6OYA9jt0CPjXc/+Lp2Vm5zSxIH3uwgGwy8fG1MHbo2vIlbez0G/0/3U6WMKtqRCFs4A=="
-  }
-}
