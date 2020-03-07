@@ -68,7 +68,7 @@ namespace ASX.Api
             }
             catch (Exception ex)
             {
-                log.Info($"Error in LoadTextFile - {ex.Message}");
+                log.Info($"Unable to load the textfile {filename} at {DateTime.Now} - {ex.Message}");
                 return false;
             }
 
@@ -84,7 +84,7 @@ namespace ASX.Api
             }
             catch (Exception ex)
             {
-                log.Info($"Error in SaveDatabaseAsync - {ex.InnerException.InnerException.Message}");
+                log.Info($"Unable to save the database at {DateTime.Now} - {ex.InnerException.InnerException.Message}");
             };
         }
     }
