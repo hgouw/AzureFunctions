@@ -18,7 +18,7 @@ namespace ASX.Api
     public static class StoreHistoricalData
     {
         [FunctionName("StoreHistoricalData")]
-        public static async Task Run([BlobTrigger("asx-text/{name}", Connection = "AzureWebJobsStorage")]Stream myBlob, string name, TraceWriter log)
+        public static void Run([BlobTrigger("asx-text/{name}", Connection = "AzureWebJobsStorage")]Stream myBlob, string name, TraceWriter log)
         {
             log.Info($"C# Blob trigger function executed at {DateTime.Now} to process blob {name} of {myBlob.Length} bytes");
 
@@ -29,7 +29,6 @@ namespace ASX.Api
                     log.Info($"Storing file {name} at {DateTime.Now}");
 
                     LoadTextFile(name, log);
-                    await Task.Delay(1);
                 }
             }
             catch (Exception ex)
@@ -63,7 +62,7 @@ namespace ASX.Api
                     IList<WatchList> _watchLists = ASXDbContext.GetWatchLists();
                     IList<EndOfDay> _endOfDays = endOfDays.Where(a => _watchLists.Any(w => w.Code == a.Code)).OrderBy(w => w.Date).ToList(); // Select the EndOfDays in WatchLists only
                     db.EndOfDays.AddRange(_endOfDays);
-                    SaveDatabaseAsync(db, log);
+                    SaveDatabase(db, log);
                 }
             }
             catch (Exception ex)
@@ -75,11 +74,11 @@ namespace ASX.Api
             return true;
         }
 
-        private static async void SaveDatabaseAsync(ASXDbContext db, TraceWriter log)
+        private static void SaveDatabase(ASXDbContext db, TraceWriter log)
         {
             try
             {
-                await db.SaveChangesAsync();
+                db.SaveChanges();
                 log.Info($"Successfully saving database at {DateTime.Now}");
             }
             catch (Exception ex)
